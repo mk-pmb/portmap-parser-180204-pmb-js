@@ -1,0 +1,30 @@
+{ "name": "portmap-parser-180204-pmb",
+  "version": "0.1.0",
+  "description": "Parser for a custom notation scheme for TCP/UDP host/port ACL/flags/options.",
+  "keywords": [],
+
+  "author": "M.K. (https://github.com/mk-pmb)",
+  "homepage": "https://github.com/mk-pmb/portmap-parser-180204-pmb-js/#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mk-pmb/portmap-parser-180204-pmb-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mk-pmb/portmap-parser-180204-pmb-js/issues"
+  },
+  "contributors": [],
+
+  "private": false, "license": "ISC",
+
+  "main": "pp.node.js",
+  "scripts": { "test": "nodejs test/all.node.js" },
+  "directories": { "test": "test" },
+
+  "dependencies": {},
+  "devDependencies": {
+    "equal-pmb": "^0.1.6"
+  },
+
+
+  "npm vs. BOM = Unexpected token": "-*- coding: UTF-8 -*-"
+}
