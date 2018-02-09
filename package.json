@@ -20,9 +20,13 @@
   "scripts": { "test": "nodejs test/all.node.js" },
   "directories": { "test": "test" },
 
-  "dependencies": {},
+  "dependencies": {
+    "esmod-pmb": "^0.1.2",
+    "qrystr": "^0.1.3"
+  },
   "devDependencies": {
-    "equal-pmb": "^0.1.6"
+    "equal-pmb": "^0.1.15",
+    "usnam-pmb": "^0.2.3"
   },
 
 
