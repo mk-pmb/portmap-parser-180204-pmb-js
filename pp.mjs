@@ -1,4 +1,4 @@
-import qrystr from 'qrystr';  // <-- supports …&flag&… -> [flag] = true
+﻿import qrystr from 'qrystr';  // <-- supports …&flag&… -> [flag] = true
 
 
 function orf(x) { return (x || false); }
@@ -18,59 +18,66 @@ function splitHostPortStr(x) {
 }
 
 
-export const splitHostPort = function (x, inval, dflt) {
+function describeHostPort(h, p) {
+  const d = h + ':' + (p || '*');
+  if (d === '*:*') { return '*'; }
+  return d;
+}
+
+
+function splitHostPort(x, inval, dflt) {
   if (!x) { return orf(inval); }
   const o = Object.assign({ host: '', port: 0 }, dflt,
     (ifObj(x) || splitHostPortStr(x)));
-  if (!o.descr) { o.descr = o.host + ':' + o.port; }
+  if (!o.descr) { o.descr = describeHostPort(o.host, o.port); }
   return o;
-};
-
+}
 
 
 const ruleRgx = /^(!?)(?![=!])(\S+?)(?:=(\S*?)|)(!|$)/;
 
-export const parseOneRule = function parseOneNetDestRule(spec) {
+function parseOneRule(spec) {
   if (!spec) { return false; }
   const m = ruleRgx.exec(spec);
-  if (!m) { throw new Error('Invalid destFilter spec: ' + spec); }
+  if (!m) { throw new Error('Invalid portmap spec: ' + spec); }
   const modif = m[1];
-  const origDest = m[2];
-  if (modif === '!') { return { origDest, '!': true }; }
+  const origAddr = splitHostPort(m[2]);
+  if (modif === '!') { return { origAddr, '!': true }; }
   let opt = (m[4] && qrystr.parse(spec.slice(m[0].length), { sepRx: /!/ }));
-  let dest = splitHostPort(origDest);
-  const redir = splitHostPort(m[3], false, dest);
+  let addr = origAddr;
+  const redir = splitHostPort(m[3], false, addr);
   if (redir) {
     if (!opt) { opt = {}; }
-    opt.origDest = dest;
-    dest = redir;
+    opt.origAddr = origAddr;
+    addr = redir;
   }
-  if (!opt) { return dest; }
-  if (!ifObj(dest)) { return opt; }
-  Object.assign(dest, opt);
-  if (redir) { dest.descr += ' as ' + opt.origDest.descr; }
-  return dest;
-};
+  if (!opt) { return addr; }
+  if (!ifObj(addr)) { return opt; }
+  Object.assign(addr, opt);
+  if (redir) { addr.descr += ' as ' + origAddr.descr; }
+  return addr;
+}
 
-export const parse = function parseRulesCatalog(specs) {
+
+function parseRulesCatalog(specs) {
   const rules = {};
   if (!specs) { return rules; }
   function parseSpec(spec) {
     const r = parseOneRule(spec);
-    const dest = (r.origDest || r.descr);
     if (!r) { return; }
-    rules[dest] = ((r['!'] === true) ? false : r);
+    const addr = orf(r.origAddr || r).descr;
+    if (!addr) { throw new Error('No topic address for rule: ' + spec); }
+    rules[addr] = ((r['!'] === true) ? false : r);
   }
   (specs.split ? specs.split(/[\s,]/) : specs).forEach(parseSpec);
   return rules;
+}
+
+
+
+
+export default {
+  parse: parseRulesCatalog,
+  parseOneRule,
+  splitHostPort,
 };
-
-
-
-
-
-
-
-
-
-/* -*- coding: UTF-8, tab-width: 2 -*- */
